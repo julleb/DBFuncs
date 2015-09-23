@@ -4,24 +4,35 @@ import (
     "database/sql"
     _"github.com/lib/pq"
     "fmt"
-    "strconv"
+   // "strconv"
 )
 
 
-type SQLRows struct {
-   Rows sql.Rows 
 
+//these structs are not inused!
+//dont delete, may need them later
+type Values struct {
+    A []Type
 }
 
-//struct for holding column name and its value
-type Tuple struct {
-    Col string
+type Type struct {
     Value interface{}
 }
 
-type Rows struct {
-    Tuples []Tuple 
-}
+//how to make a query
+
+/*
+    var values []interface{}
+    values = append(values, 601)
+    r := db.Query("INSERT INTO information(cpu_temp) values($1)", values ) 
+    var col string
+    for r.Next() { 
+        r.Scan(&col)
+        fmt.Println(col)
+    }
+*/
+
+
 
 var db *sql.DB
 
@@ -33,54 +44,31 @@ func OpenDBConnection() {
     db = tempdb
 }
 
-
 //////////
-// A Generic function to insert into a database table
-// param tableName - name of the table
-// param rows - A struct which includes the column names and values for each columnn
+// A Generic function to query to database
+// 
+// param values - the values contains the value we are going to query
 //////////   
-func InsertIntoTable(tableName string, rows Rows) {
-    query := "INSERT INTO " + tableName + "("
-    valuesString := "VALUES("
-    values := []interface{}{}
-    //building our query
-    for i,v := range rows.Tuples { //foreach
-        query += v.Col + ",";
-        valuesString +="$" + strconv.Itoa((i+1)) + ","
-        values = append(values, v.Value)
-    }
-    fmt.Println("valueString " + valuesString)
-    query = replaceAtIndex(query, ')', len(query)-1)
-    valuesString = replaceAtIndex(valuesString, ')', len(valuesString)-1)
-    query += " " +valuesString;
-    fmt.Println(query)
-   
-    stmt, err := db.Prepare(query) 
-    defer stmt.Close()
-    _, err = stmt.Query(values...)
+func Query(query string, values []interface{}) (*sql.Rows) {
+    var rows *sql.Rows
+    var err error
+    var stmt *sql.Stmt
+    if(values == nil) { // no stmt
+          rows, err = db.Query(query)      
+    }else {
+        fmt.Println("this shoudl happend")
+        stmt, err = db.Prepare(query)
+        fmt.Println(values[0])
+        fmt.Println(query)
+        rows, err = stmt.Query(values...) 
+        defer stmt.Close()
+    } 
     if err != nil {
-        fmt.Println("everything is dead " , err)		
+        fmt.Println("HALLÅÅÅÅ DEAD " , err)		
 	}
-
-} 
-
-func SelectFromTable(tableName string, rows Rows) {
-    query := "SELECT ";
-      
-    
-}
-
-func SelectAllFromTable(tableName string) (*sql.Rows) {
-    query := "SELECT * FROM " + tableName
-    rows, err := db.Query(query)
-    if err != nil {
-		fmt.Println(err)
-	}
-	
     return rows
-    //it is very important to call DeferRows, when u are done, to avoid runtime panic
+    //important to call DeferRows,when u are done, to avoid runtime panic
 }
-
 //after all queries, you have to call this after you are done with Rows
 func DeferRows(rows *sql.Rows) {
    defer rows.Close() 
