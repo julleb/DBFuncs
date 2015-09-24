@@ -38,10 +38,14 @@ var db *sql.DB
 
 func OpenDBConnection() {
     tempdb, err := sql.Open("postgres", "user=postgres password=lol dbname=servermonitor")
-	if err != nil {
-		fmt.Println("Unable to conenct to the db! ", err)
-	}
+	check(err)
     db = tempdb
+}
+
+func check(err error) {
+    if err != nil {
+        fmt.Println(err)		
+	}
 }
 
 //////////
@@ -54,15 +58,16 @@ func Query(query string, values []interface{}) (*sql.Rows) {
     var err error
     var stmt *sql.Stmt
     if(values == nil) { // no stmt
-          rows, err = db.Query(query)      
+          rows, err = db.Query(query)
+          check(err)      
     }else {
         stmt, err = db.Prepare(query)
+        check(err)
         rows, err = stmt.Query(values...)
+        check(err)
         defer stmt.Close()
     } 
-    if err != nil {
-        fmt.Println("HALLÅÅÅÅ DEAD " , err)		
-	}
+    check(err)
     return rows
     //important to call DeferRows,when u are done, to avoid runtime panic
 }
