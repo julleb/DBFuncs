@@ -37,9 +37,10 @@ type Type struct {
 var db *sql.DB
 
 func OpenDBConnection() {
-    tempdb, err := sql.Open("postgres", "user=postgres password=lol dbname=servermonitor")
+    var err error
+    db, err = sql.Open("postgres", "user=postgres password=lol dbname=servermonitor")
 	check(err)
-    db = tempdb
+    
 }
 
 func check(err error) {
