@@ -65,6 +65,10 @@ func Query(query string, values []interface{}) (*sql.Rows) {
         stmt, err = db.Prepare(query)
         fmt.Println("PREPARE")
         check(err)
+        for i:=0; i < len(values); i++ {
+            fmt.Println(values[i])
+        }
+        fmt.Println("---------------")
         rows, err = stmt.Query(values...)
         fmt.Println("QUERY !!!")
         check(err)
