@@ -56,11 +56,8 @@ func Query(query string, values []interface{}) (*sql.Rows) {
     if(values == nil) { // no stmt
           rows, err = db.Query(query)      
     }else {
-        fmt.Println("this shoudl happend")
         stmt, err = db.Prepare(query)
-        fmt.Println(values[0])
-        fmt.Println(query)
-        rows, err = stmt.Query(values...) 
+        rows, err = stmt.Query(values...)
         defer stmt.Close()
     } 
     if err != nil {
@@ -71,7 +68,7 @@ func Query(query string, values []interface{}) (*sql.Rows) {
 }
 //after all queries, you have to call this after you are done with Rows
 func DeferRows(rows *sql.Rows) {
-   defer rows.Close() 
+   defer rows.Close()
 }
 
 
