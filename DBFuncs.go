@@ -62,8 +62,10 @@ func Query(query string, values []interface{}) (*sql.Rows) {
           check(err)      
     }else {
         stmt, err = db.Prepare(query)
+        fmt.Println("PREPARE")
         check(err)
         rows, err = stmt.Query(values...)
+        fmt.Println("QUERY !!!")
         check(err)
         defer stmt.Close()
     } 
