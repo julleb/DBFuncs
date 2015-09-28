@@ -38,7 +38,7 @@ var db *sql.DB
 
 func OpenDBConnection() {
     var err error
-    db, err = sql.Open("postgres", "user=postgres password=lol dbname=servermonitor")
+    db, err = sql.Open("postgres", "user=postgres password=lol dbname=servermonitor sslmode=disable")
 	check(err)
     
 }
@@ -63,14 +63,9 @@ func Query(query string, values []interface{}) (*sql.Rows) {
           check(err)      
     }else {
         stmt, err = db.Prepare(query)
-        fmt.Println("PREPARE")
         check(err)
-        for i:=0; i < len(values); i++ {
-            fmt.Println(values[i])
-        }
-        fmt.Println("---------------")
+        
         rows, err = stmt.Query(values...)
-        fmt.Println("QUERY !!!")
         check(err)
         defer stmt.Close()
     } 
